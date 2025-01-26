@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Diffusion-Planner</title>
+  <style>
+    .hidden {
+      display: none;
+    }
+
+    .video-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .video-container {
+      border: 2px solid #ccc;
+      border-radius: 15px;
+      padding: 5px;
+    }
+
+    video {
+      border-radius: 10px;
+    }
+
+    .always-visible {
+      display: block !important;
+      /* 强制始终可见 */
+    }
+
+    .custom-list {
+      list-style-type: disc;
+      /* 使用圆点 */
+      padding-left: 20px;
+      /* 添加左边距，使圆点和文本不重叠 */
+    }
+
+    .custom-list li {
+      font-size: 18px;
+      /* 设置字体大小 */
+      color: black;
+      /* 设置文本颜色 */
+    }
+
+    .left7container {
+      width: 60%;
+      padding: 20px;
+      box-sizing: border-box;
+      margin-left: 80px;
+      overflow: hidden;
+    }
+
+    .right3container {
+      width: 30%;
+      padding: 20px;
+      box-sizing: border-box;
+      margin-right: 30px;
+    }
+
+    .right3container img {
+      width: 100%;
+      height: auto;
+      border: 2px solid #ccc;
+      /* 图片边框 */
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="utf-8">
+  <meta name="description" content="Diffusion-Based Planning for Autonomous Driving with Flexible Guidance">
+  <meta name="keywords"
+    content="Diffusion Model, Autonomous Driving, Planner, Diffusion Planner, Guidance for Autonomous Driving, AI">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diffusion-Based Planning for Autonomous Driving with Flexible Guidance</title>
+
+  <link rel="icon" href="./assets/img/icon.png">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./assets/css/bulma.min.css">
+  <link rel="stylesheet" href="./assets/css/button.css">
+  <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./assets/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <script defer src="./assets/js/fontawesome.all.min.js"></script>
+
+</head>
+
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More Research
+          </a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://zhengyinan-air.github.io/FISOR/">
+              <b>FISOR: Safe Offline Reinforcement Learning (ICLR 2024)</b>
+              <p style="font-size:18px; display: inline; margin-left: 5px;"></p>
+            </a>
+            <a class="navbar-item" href="https://2toinf.github.io/DecisionNCE/">
+              <b>DecisionNCE: Representation Pretrain for Robotics (ICML 2024)</b>
+              <p style="font-size:18px; display: inline; margin-left: 5px;"></p>
+            </a>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title is-bold">
+              <img src="./assets/img/icon.png" style="width:1em;vertical-align: middle" alt="Logo" />
+              <span class="mmmu" style="vertical-align: middle">Diffusion-Planner</span>
+            </h1>
+            <h2 class="subtitle is-3 publication-subtitle">
+              Diffusion-Based Planning for Autonomous Driving with Flexible Guidance
+              <!-- <br>
+                and Reasoning Benchmark for Expert AGI -->
+            </h2>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Yinan Zheng*<sup style="color:#007bff;">†,1</sup>,</span>
+              <span class="author-block">Ruiming Liang*<sup style="color:#ed4b82;">2</sup>,</span>
+              <span class="author-block">Kexin Zheng*<sup style="color:#1c8427;">3</sup>,</span>
+              <span class="author-block">Jinliang Zheng<sup style="color:#007bff;">1</sup>,</span>
+              <span class="author-block">Liyuan Mao<sup style="color:#ffac33;">4</sup>,</span>
+              <span class="author-block">Jianxiong Li<sup style="color:#007bff;">1</sup>,</span><br>
+              <span class="author-block">Weihao Gu<sup style="color:#680e0e;">5</sup>,</span>
+              <span class="author-block">Rui Ai<sup style="color:#680e0e;">5</sup>,</span>
+              <span class="author-block">Shengbo Eben Li<sup style="color:#007bff;">1</sup>,</span>
+              <span class="author-block">Xianyuan Zhan<sup style="color:#007bff;">✉,1,</sup>,<sup
+                  style="color:#9d810fcc;">6</sup></span>
+              <span class="author-block">Jingjing Liu<sup style="color:#007bff;">✉,1</sup>,</span>
+            </div>
+
+            <br>
+
+            <div class="is-size-6 publication-authors">
+              <span class="author-block"><sup style="color:#007bff;">1</sup>Tsinghua University</span>
+              <span class="author-block"><sup style="color:#ed4b82;">2</sup>Institute of Automation, Chinese Academy of
+                Sciences</span><br>
+              <span class="author-block"><sup style="color:#1c8427;">3</sup>The Chinese University of Hong Kong</span>
+              <span class="author-block"><sup style="color:#ffac33;">4</sup>Shanghai Jiao Tong University</span><br>
+              <span class="author-block"><sup style="color:#680e0e;">5</sup>HAOMO.AI</span>
+              <span class="author-block"><sup style="color:#9d810fcc;">6</sup>Shanghai Artificial Intelligence
+                Laboratory</span>
+            </div>
+
+            <br>
+            <div class="is-size-6 publication-authors">
+              <span class="author-block">*Equal contribution, ✉Corresponding author</span><br>
+              <span class="author-block">†Project Lead:</span>
+              <span class="author-block"><a
+                  href="mailto:zhengyn23@mails.tsinghua.edu.cn">zhengyn23@mails.tsinghua.edu.cn</a></span>
+            </div>
+
+
+            <div class="column has-text-centered">
+              <h1 class="title is-4 mmmu" style="margin-top: 2vh">Accepted by ICLR 2025</h1>
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Arxiv (Comming Soon)</span>
+                  </a>
+                </span>
+                </span>
+                <span class="link-block">
+                  <!-- @TODO: change links -->
+                  <a class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <p style="font-size:18px">🔗</p>
+                    </span>
+                    <span>Dataset (Comming Soon)</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/ZhengYinan-AIR/Diffusion-Planner"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://huggingface.co/ZhengYinan2001/Diffusion-Planner"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <img src="./assets/img/huggingface.png">
+                    </span>
+                    <span>Model</span>
+                  </a>
+                </span>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <style>
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%;
+    }
+  </style>
+
+
+  <!-- <section class="hero is-light is-small", style=""> -->
+
+  <div class="container" style="margin-bottom: 2vh; margin-top: 4vh">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-4">100s Closed Loop Perfromance of Diffusion Planner without Refinement</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="video-row">
+    <div class="video-container always-visible">
+      <video class="center" loop controls style="width: 500px; height: auto;">
+        <source src="./assets/video/long/final_110.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <div class="columns is-centered has-text-centered" style="margin-bottom: 2vh; margin-top: 1vh;">
+    <div class="column is-four-fifths">
+      <p><span style="color: #2FA8DF;">Future planning</span> of the ego vehicle; <span
+          style="color: #60B083;">Predictions</span> for neighboring vehicles; <span style="color: #6472EC;"> Ground
+          truth </span> ego trajectory; <span style="color: #D32B2D;">Driving history</span> of the ego vehicle.</p>
+    </div>
+  </div>
+  <!-- </section> -->
+
+  <section class="section">
+    <div class="container is-max-desktop" style="margin-bottom: 2vh;">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Achieving human-like driving behaviors in complex open-world environments is a critical challenge in
+              autonomous driving.
+              Contemporary learning-based planning approaches such as imitation learning methods often struggle to
+              balance competing objectives and lack of safety assurance,
+              due to limited adaptability and inadequacy in learning complex multi-modal behaviors commonly exhibited in
+              human planning, not to mention their strong reliance on the fallback strategy with predefined rules.
+              We propose a novel <b>transformer-based Diffusion Planner</b> for <b>closed-loop planning</b>, which can
+              effectively model multi-modal driving behavior and ensure trajectory quality <b>without any rule-based
+                refinement</b>.
+              Our model supports joint modeling of both prediction and planning tasks under the same architecture,
+              enabling cooperative behaviors between vehicles.
+              Moreover, by learning the gradient of the trajectory score function and employing a flexible classifier
+              guidance mechanism, Diffusion Planner effectively achieves safe and adaptable planning behaviors.
+              Evaluations on the large-scale real-world autonomous planning benchmark nuPlan and our newly collected
+              <b>200-hour delivery-vehicle driving dataset</b> demonstrate that Diffusion Planner achieves SOTA
+              closed-loop performance with robust transferability in diverse driving styles.
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+  <section class="hero is-light is-small">
+    <div class="hero-body has-text-centered">
+      <h1 class="title is-1 mmmu">Methods</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <!-- <div class="column is-full-width has-text-centered"> -->
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Architecture</h2>
+          <div class="content has-text-justified">
+            <h2 class="title is-6">Diffusion Planner leverages the expressive and flexible diffusion model to enhance
+              autonomous planning:</h2>
+            <p>
+            <ul>
+              <li>DiT-based architecture focusing on the fusion of noised future vehicle trajectories and conditional
+                information;</li>
+              <li>Joint modeling of key participants' statuses, unifying motion prediction and closed-loop planning as
+                future trajectory generation;</li>
+              <li>Fast inference during diffusion sampling, achieving around 20Hz for real-time performance</li>
+            </ul>
+            </p>
+            <div class="content has-text-centered">
+              <img src="./assets/img/architecture.png" alt="algebraic reasoning" class="center">
+              <p><b><i>Figure 1:</i></b> Diffusion Planner Architectuer</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <!-- <div class="column is-full-width has-text-centered"> -->
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Planning Behavior Alignment via Classifier Guidance</h2>
+          <!-- <div class="content has-text-centered">
+          <img src="./assets/img/guidance.png" alt="algebraic reasoning" class="center">
+          <p><b><i>Figure 2:</i></b> Target speed and comfort guidance: For target speed guidance, the speed changes before and after guidance are plotted. For comfort guidance, the longitudinal jerk changes are compared before and after applying comfort guidance on top of collision avoidance guidance.</p>
+        </div> -->
+        </div>
+      </div>
+      <div
+        style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-top: 10px;">
+        <div class="left7container">
+          <div class="content has-text-justified">
+            <p style="text-align: justify;">
+              Enforcing versatile and controllable driving behavior is crucial for real-world autonomous driving. For
+              example, vehicles must ensure safety and comfort while adjusting speeds to align with user preferences.
+              Thanks to its close relationship to Energy-Based Models, diffusion model can conveniently inject such
+              preferences via classifier guidance. We briefly describe some applicable energy functions that can be used
+              to customize the planning behavior of the model. <br>
+            <ul>
+              <li><b>Target speed maintenance:</b> The speed difference is used as the energy, calculated by comparing
+                the
+                planned average speed with the set target speed.</li>
+              <li><b>Comfort:</b> The energy function is calculated by measuring the amount by which the vehicle's state
+                exceeds the predefined limits.</li>
+              <li>
+                <b>Collision avoidance:</b> The signed distance between the ego vehicle and neighboring vehicles is
+                computed at each timestamp.
+              </li>
+              <li><b>Staying within drivable area:</b> The distance the ego vehicle deviates outside the lane at each
+                time
+                step is calculated.</li>
+            </ul>
+            Additionally, this training-free approach supports flexible combinations during inference time, providing a
+            solution for controllable trajectory generation in complex scenarios.
+            For example, as shown in <b>Figure 2</b>, under collision guidance alone, the ego vehicle veers off the road
+            to avoid a rear-approaching vehicle.
+            However, when drivable guidance is added, the vehicle stays on the road while maintaining safety.
+            </p>
+          </div>
+        </div>
+        <div class="right3container">
+          <img src="./assets/img/collision_drivable.png" alt="Illustration"
+            style="border: 2px solid #ccc; padding: 1px; gap: 1px;">
+          <p><b><i>Figure 2:</i></b> Starting from the same position, the trajectories driven under different guidance
+            settings.</p>
+        </div>
+
+      </div>
+
+      <div class="container">
+        <div class="columns is-centered" style="gap: 10px; margin-bottom: 30px; margin-top: 30px;">
+          <button class="login2 image-switch-btn" data-group="1">Collision Guidance</button>
+          <button class="login2 image-switch-btn" data-group="3">Drivable Guidance</button>
+          <button class="login2 image-switch-btn" data-group="4">Comfort and Speed Guidance</button>
+        </div>
+      </div>
+
+      <!-- <div class="content has-text-centered">
+      <div class="video-row">
+        <div class="image-container group-1" style="border: 1px solid black; padding: 1px; gap: 1px;">
+          <img src="./assets/img/collision.png" alt="algebraic reasoning" class="center"
+            style="width: 300px; height: auto;">
+        </div>
+        <div class="image-container group-1" style="border: 1px solid black; padding: 1px; gap: 1px;">
+          <img src="./assets/img/collision_drivable.png" alt="algebraic reasoning" class="center"
+            style="width: 265px; height: auto;">
+        </div>
+      </div> -->
+      <!-- <div class="image-container group-1">
+        <p><b><i>Figure 2:</i></b> (Left) Collision avoidance guidance: Closed-loop tests start from the same point,
+          with driven trajectories plotted. <br>(Right) Under collision guidance alone, the ego vehicle veers off the
+          road to avoid a rear-approaching vehicle. When drivable guidance is added, the vehicle stays on the road while
+          maintaining safety.</p>
+      </div>
+
+      <div class="image-container group-3">
+        <img src="./assets/img/guidance.png" alt="algebraic reasoning" class="center"
+          style="width: 900px; height: auto;">
+      </div>
+      <div class="image-container group-3">
+        <p><b><i>Figure 3:</i></b> Target speed and comfort guidance: For target speed guidance, the speed changes
+          before and after guidance are plotted. For comfort guidance, the longitudinal jerk changes are compared before
+          and after applying comfort guidance on top of collision avoidance guidance.</p>
+      </div>
+    </div> -->
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="image-container video-container group-1" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/colli_guidance/c1.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="image-container video-container group-1" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/colli_guidance/c2.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="image-container video-container group-1" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/colli_guidance/c3.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+      <div class="image-container group-1">
+        <p> <b>Case studies for collision guidance</b>:
+          Starting from the same position, we visualized the closed-loop test results. The dashed line with the blurred
+          yellow car represents the results without guidance, while the solid line with the solid car represents the
+          results with guidance.
+        </p>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="image-container video-container group-3" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/dri_guidance/d1.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="image-container video-container group-3" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/dri_guidance/d2.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="image-container video-container group-3" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/dri_guidance/d3.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+      <div class="image-container group-3">
+        <p> <b>Case studies for drivable guidance</b>:
+          Starting from the same position, we visualized the closed-loop test results. The dashed line with the blurred
+          yellow car represents the results without guidance, while the solid line with the solid car represents the
+          results with guidance.
+        </p>
+      </div>
+
+      <div class="content has-text-centered">
+        <div class="image-container group-4">
+          <img src="./assets/img/guidance.png" alt="algebraic reasoning" class="center"
+            style="width: 900px; height: auto;">
+        </div>
+        <div class="image-container group-4">
+          <p> <b>Case studies for speed and comfort guidance</b>:
+            For target speed guidance, the speed changes
+            before and after guidance are plotted. For comfort guidance, the longitudinal jerk changes are compared
+            before
+            and after applying comfort guidance on top of collision avoidance guidance.
+          </p>
+        </div>
+      </div>
+  </section>
+
+  <!-- RESULTS SECTION -->
+  <section class="hero is-light is-small">
+    <div class="hero-body has-text-centered">
+      <h1 class="title is-1 mmmu">Experiment Results</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <!-- <div class="column is-full-width has-text-centered"> -->
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">SOTA Closed-loop Performance on nuPlan Dataset</h2>
+          <div class="content has-text-centered">
+            <img src="./assets/img/nuplan_result.png" alt="algebraic reasoning" class="center">
+            <p><b><i>Table 1:</i></b> Closed-loop planning results on <a
+                href="https://www.nuscenes.org/nuplan">nuPlan</a> dataset. <span style="color: #95c1da;">Blue</span>:
+              The highest scores of baselines in various types. <br>
+              *: Using pre-searched reference lines as model input provides prior knowledge, reducing the difficulty of
+              planning compared to standard learning-based methods.
+              NR: non-reactive mode. R: reactive mode.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- Section Title -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3" style="margin-bottom: 30px;">Qualitative Results</h2>
+          <div class="content has-text-centered">
+            <img src="./assets/img/quality.png" alt="algebraic reasoning" class="center">
+            <p><b><i>Figure 4:</i></b> Future trajectory generation visualization. A frame from a challenging narrow
+              road turning scenario in the closed-loop test.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="columns is-centered has-text-centered">
+          <!-- <div class="column is-four-fifths">
+            <h2 class="title is-5" , style="margin-top: 2vh;">Click and change the scenarios!</h2>
+          </div> -->
+        </div>
+        <div class="columns is-centered" style="gap: 10px; margin-bottom: 30px; margin-top: 10px;">
+          <button class="login video-switch-btn" data-group="1">Change Lane</button>
+          <button class="login video-switch-btn" data-group="2">Multiple Vehicle</button>
+          <button class="login video-switch-btn" data-group="3">Interactions</button>
+          <button class="login video-switch-btn" data-group="4">Left Turn</button>
+          <button class="login video-switch-btn" data-group="5">Multiple Ped</button>
+          <button class="login video-switch-btn" data-group="6">Roundabout</button>
+        </div>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="video-container group-1" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/change_lane/7f50df6eea5c54e9.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-1" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/change_lane/2f149371d38e5806.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-1" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/change_lane/4cb9cb32dedf5709.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="video-container group-2" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/multiple/4d8aa5aba1b157fc.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-2" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/multiple/71544041acf754bc.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-2" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/multiple/ebf09047e62a5fb8.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="video-container group-3" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/left_right_turn/338ca19e3fde5381.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-3" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/left_right_turn/cbdc3e2a73e15687.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-3" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/intersection/e0834d617d8d5453.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="video-container group-4" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/left_right_turn/56218a261c2b571c.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-4" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/s_turn/d32b47d0369753ee.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-4" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/left_right_turn/56ca9c04a21253d7.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="video-container group-5" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/left_right_turn/61f6e42143cf5eb9.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-5" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/mul_ped/3b25d3d620a458c4.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-5" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/left_right_turn/b8fc7d499e705b68.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+      <div class="columns is-centered is-multiline" style="gap: 10px;">
+        <div class="video-container group-6" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/roundabout/7a1df77260c95268.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-6" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/roundabout/144473d8f03a57f4.mp4" type="video/mp4">
+          </video>
+        </div>
+        <div class="video-container group-6" style="margin: 10px;">
+          <video class="center" loop controls style="width: 350px; height: auto;">
+            <source src="./assets/video/roundabout/c998657ba1535677.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+
+  </section>
+
+  <section class="hero is-light is-small">
+    <div class="hero-body has-text-centered">
+      <h1 class="title is-1 mmmu">Datasets</h1>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <!-- <div class="column is-full-width has-text-centered"> -->
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Delicery-vehicle Dataset from <a href="https://haomo.ai/">Haomo.AI</a></h2>
+          <div class="content has-text-centered">
+            <img src="./assets/img/deliverydata.png" alt="algebraic reasoning" class="center"
+              style="width: 600px; height: auto;">
+            <p><b><i>Figure 5:</i></b> Scenario count by type in the delivery-vehicle driving dataset, with
+              representative visualizations.</p>
+          </div>
+          <div class="content has-text-justified" style="width: 1000px; margin-left: 100px; margin-top: 10px">
+            <p>
+              We collected approximately <b>200 hours of real-world data using an autonomous logistics delivery vehicle
+              </b>. <br>
+              The task of the delivery vehicle is similar to that of a robotaxi in nuPlan, as it autonomously navigates
+              a designated route. <br>
+              During operation, the vehicle must comply with traffic regulations, ensure safety, and complete the
+              delivery as efficiently as possible. <br><br>
+              <b>Compared to the vehicles in the nuPlan dataset, the delivery vehicle</b>
+            <ul>
+              <li>is smaller, with lower speeds operation;</li>
+              <li>is able to travel on both main roads and bike lanes;</li>
+              <li>could be more frequently interacts with pedestrians and cyclists, while facing a different driving
+                rule</li>
+            </ul>
+            </p>
+          </div>
+        </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Closed-loop Performance on Delivery-vehicle Dataset</h2>
+          <div class="content has-text-centered">
+            <img src="./assets/img/deliverry_result.png" alt="algebraic reasoning" class="center" style="width: 800px;">
+            <p><b><i>Table 2:</i></b> Closed-loop planning results on delivery-vehicle driving dataset.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <p><b>Dataset is comming soon...</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3 has-text-centered">BibTeX</h2>
+      <pre><code>
+        @inproceedings{
+        zheng2025diffusion,
+        title={Diffusion-Based Planning for Autonomous Driving with Flexible Guidance},
+        author={Yinan Zheng and Ruiming Liang and Kexin Zheng and Jinliang Zheng and Liyuan Mao and Jianxiong Li and Weihao Gu and Rui Ai and Shengbo Eben Li and Xianyuan Zhan and Jingjing Liu},
+        booktitle={The Thirteenth International Conference on Learning Representations},
+        year={2025},
+        url={https://openreview.net/forum?id=wM2sfVgMDH}
+        }
+      </code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <!-- <div class="container"> -->
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>
+            This website is website adapted from <a href="https://mmmu-benchmark.github.io/">MMMU</a>, licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+              Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+
+<script>let currentSlide = 0;
+
+  //  <!-- zjl revise here!!!!! -->
+  const slide_length = [0, 6, 10, 16, 20]
+  const slideContainer = document.getElementById('slider-container');
+  const slides = slideContainer.children;
+  const dots = document.querySelectorAll('#slider-dots button');
+  const totalSlides = slides.length;
+  function updateSlider(animate = true) {
+    const slideWidth = slides[0].offsetWidth + 16;
+    const offset = currentSlide * slideWidth;
+
+    if (animate) {
+      slideContainer.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    } else {
+      slideContainer.style.transition = 'none';
+    }
+
+    slideContainer.style.transform = `translateX(-${offset}px)`;
+
+    dots.forEach((dot, index) => {
+      dot.style.backgroundColor = (slide_length[index] <= currentSlide & currentSlide < slide_length[index + 1]) ? '#4F46E5' : '#D1D5DB';
+    });
+  }
+  function slideLeft() {
+    if (currentSlide > 0) {
+      currentSlide--;
+      updateSlider();
+    } else {
+      // Optional: Bounce effect when at the start
+      slideContainer.style.transform = `translateX(20px)`;
+      setTimeout(() => {
+        slideContainer.style.transform = `translateX(0px)`;
+      }, 150);
+    }
+  }
+  function slideRight() {
+    if (currentSlide < totalSlides - 1) {
+      currentSlide++;
+      updateSlider();
+    } else {
+      // Optional: Bounce effect when at the end
+      const maxOffset = (totalSlides - 1) * (slides[0].offsetWidth + 16);
+      slideContainer.style.transform = `translateX(-${maxOffset - 20}px)`;
+      setTimeout(() => {
+        slideContainer.style.transform = `translateX(-${maxOffset}px)`;
+      }, 150);
+    }
+  }
+  function handleTouchStart(e) {
+    const touch = e.touches[0];
+    window.touchStartX = touch.clientX;
+    window.touchStartY = touch.clientY;
+    slideContainer.style.transition = 'none';
+  }
+  function handleTouchMove(e) {
+    if (!window.touchStartX) return;
+
+    const touch = e.touches[0];
+    const diffX = touch.clientX - window.touchStartX;
+    const diffY = touch.clientY - window.touchStartY;
+
+    // If vertical scrolling is dominant, don't slide
+    if (Math.abs(diffY) > Math.abs(diffX)) return;
+
+    e.preventDefault();
+    const slideWidth = slides[0].offsetWidth + 16;
+    const currentOffset = -(currentSlide * slideWidth);
+    const newOffset = currentOffset + diffX;
+
+    slideContainer.style.transform = `translateX(${newOffset}px)`;
+  }
+  function handleTouchEnd(e) {
+    if (!window.touchStartX) return;
+
+    const touch = e.changedTouches[0];
+    const diffX = touch.clientX - window.touchStartX;
+
+    if (Math.abs(diffX) > 50) {
+      if (diffX > 0 && currentSlide > 0) {
+        slideLeft();
+      } else if (diffX < 0 && currentSlide < totalSlides - 1) {
+        slideRight();
+      } else {
+        updateSlider();
+      }
+    } else {
+      updateSlider();
+    }
+
+    window.touchStartX = null;
+    window.touchStartY = null;
+  }
+  // Add touch events
+  slideContainer.addEventListener('touchstart', handleTouchStart);
+  slideContainer.addEventListener('touchmove', handleTouchMove);
+  slideContainer.addEventListener('touchend', handleTouchEnd);
+  // Add click event listeners to buttons
+  const leftButton = document.getElementById('id-88');
+  const rightButton = document.getElementById('id-90');
+  if (leftButton) leftButton.addEventListener('click', slideLeft);
+  if (rightButton) rightButton.addEventListener('click', slideRight);
+  // Add click events to dots
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      currentSlide = slide_length[index];
+      updateSlider();
+    });
+  });
+  // Initialize slider
+  document.addEventListener('DOMContentLoaded', () => {
+    updateSlider(false);
+  });
+  // Update on window resize with debounce
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => updateSlider(false), 100);
+  });</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const videoContainers = document.querySelectorAll('.video-container');
+    const buttons = document.querySelectorAll('.video-switch-btn');
+    function showVideoGroup(groupNumber) { videoContainers.forEach(container => { if (container.classList.contains(`group-${groupNumber}`)) { container.style.display = 'block'; } else { container.style.display = 'none'; } }); buttons.forEach(btn => { if (btn.dataset.group === groupNumber.toString()) { btn.classList.add('bg-custom', 'text-white'); btn.classList.remove('bg-white'); } else { btn.classList.remove('bg-custom', 'text-white'); btn.classList.add('bg-white'); } }); } buttons.forEach(btn => { btn.addEventListener('click', () => { showVideoGroup(parseInt(btn.dataset.group)); }); }); showVideoGroup(1);
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const videoContainers = document.querySelectorAll('.image-container');
+    const buttons = document.querySelectorAll('.image-switch-btn');
+    function showVideoGroup(groupNumber) { videoContainers.forEach(container => { if (container.classList.contains(`group-${groupNumber}`)) { container.style.display = 'block'; } else { container.style.display = 'none'; } }); buttons.forEach(btn => { if (btn.dataset.group === groupNumber.toString()) { btn.classList.add('bg-custom', 'text-white'); btn.classList.remove('bg-white'); } else { btn.classList.remove('bg-custom', 'text-white'); btn.classList.add('bg-white'); } }); } buttons.forEach(btn => { btn.addEventListener('click', () => { showVideoGroup(parseInt(btn.dataset.group)); }); }); showVideoGroup(1);
+  });
+
+  const initialimgButton = document.querySelector('.image-switch-btn[data-group="1"]');
+  if (initialimgButton) {
+    initialimgButton.focus(); // 触发按钮的 focus 状态
+  }
+
+  // const initialvideoButton = document.querySelector('.video-switch-btn[data-group="1"]');
+  // if (initialvideoButton) {
+  //  initialvideoButton.focus(); // 触发按钮的 focus 状态
+  // }
+</script>
