@@ -869,20 +869,54 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const videoContainers = document.querySelectorAll('.video-container');
-    const buttons = document.querySelectorAll('.video-switch-btn');
-    function showVideoGroup(groupNumber) { videoContainers.forEach(container => { if (container.classList.contains(`group-${groupNumber}`)) { container.style.display = 'block'; } else { container.style.display = 'none'; } }); buttons.forEach(btn => { if (btn.dataset.group === groupNumber.toString()) { btn.classList.add('bg-custom', 'text-white'); btn.classList.remove('bg-white'); } else { btn.classList.remove('bg-custom', 'text-white'); btn.classList.add('bg-white'); } }); } buttons.forEach(btn => { btn.addEventListener('click', () => { showVideoGroup(parseInt(btn.dataset.group)); }); }); showVideoGroup(1);
-  });
+    const videoButtons = document.querySelectorAll('.video-switch-btn');
+    const imageContainers = document.querySelectorAll('.image-container');
+    const imageButtons = document.querySelectorAll('.image-switch-btn');
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const videoContainers = document.querySelectorAll('.image-container');
-    const buttons = document.querySelectorAll('.image-switch-btn');
-    function showVideoGroup(groupNumber) { videoContainers.forEach(container => { if (container.classList.contains(`group-${groupNumber}`)) { container.style.display = 'block'; } else { container.style.display = 'none'; } }); buttons.forEach(btn => { if (btn.dataset.group === groupNumber.toString()) { btn.classList.add('bg-custom', 'text-white'); btn.classList.remove('bg-white'); } else { btn.classList.remove('bg-custom', 'text-white'); btn.classList.add('bg-white'); } }); } buttons.forEach(btn => { btn.addEventListener('click', () => { showVideoGroup(parseInt(btn.dataset.group)); }); }); showVideoGroup(1);
-  });
+    // 显示相应组的内容并更新按钮颜色
+    function showGroup(groupNumber, containers, buttons) {
+        containers.forEach(container => {
+            if (container.classList.contains(`group-${groupNumber}`)) {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        });
 
-  const initialimgButton = document.querySelector('.image-switch-btn[data-group="1"]');
-  if (initialimgButton) {
-    initialimgButton.focus(); // 触发按钮的 focus 状态
-  }
+        buttons.forEach(btn => {
+            if (btn.dataset.group === groupNumber.toString()) {
+                btn.classList.add('bg-custom', 'text-white'); // 设置选中的按钮样式
+                btn.classList.remove('bg-white');
+            } else {
+                btn.classList.remove('bg-custom', 'text-white'); // 移除非选中按钮的样式
+                btn.classList.add('bg-white');
+            }
+        });
+    }
+
+    // 为视频按钮添加点击事件
+    videoButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            showGroup(parseInt(btn.dataset.group), videoContainers, videoButtons);
+        });
+    });
+
+    // 为图片按钮添加点击事件
+    imageButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            showGroup(parseInt(btn.dataset.group), imageContainers, imageButtons);
+        });
+    });
+
+    // 初始化时默认显示第一组（组1）
+    showGroup(1, videoContainers, videoButtons);
+    showGroup(1, imageContainers, imageButtons);
+});
+
+  // const initialimgButton = document.querySelector('.image-switch-btn[data-group="1"]');
+  // if (initialimgButton) {
+  //   initialimgButton.focus(); // 触发按钮的 focus 状态
+  // }
 
   // const initialvideoButton = document.querySelector('.video-switch-btn[data-group="1"]');
   // if (initialvideoButton) {
