@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Diffusion-Planner</title>
+  <style>
+    .hidden {
+      display: none;
+    }
+
+    .video-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .video-container {
+      border: 2px solid #ccc;
+      border-radius: 15px;
+      padding: 5px;
+    }
+
+    video {
+      border-radius: 10px;
+    }
+
+    .always-visible {
+      display: block !important;
+      /* 强制始终可见 */
+    }
+
+    .custom-list {
+      list-style-type: disc;
+      /* 使用圆点 */
+      padding-left: 20px;
+      /* 添加左边距，使圆点和文本不重叠 */
+    }
+
+    .custom-list li {
+      font-size: 18px;
+      /* 设置字体大小 */
+      color: black;
+      /* 设置文本颜色 */
+    }
+
+    .left7container {
+      width: 60%;
+      padding: 20px;
+      box-sizing: border-box;
+      margin-left: 80px;
+      overflow: hidden;
+    }
+
+    .right3container {
+      width: 30%;
+      padding: 20px;
+      box-sizing: border-box;
+      margin-right: 30px;
+    }
+
+    .right3container img {
+      width: 100%;
+      height: auto;
+      border: 2px solid #ccc;
+      /* 图片边框 */
+    }
+
+    ul {
+      list-style-type: disc;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="utf-8">
+  <meta name="description" content="Unleashing the Potential of Diffusion Models for End-to-End Autonomous Driving">
+  <meta name="keywords" content="Diffusion Model, End-to-End Autonomous Driving, Planner, Diffusion Planner, AI">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unleashing the Potential of Diffusion Models for End-to-End Autonomous Driving</title>
+
+  <link rel="icon" href="./assets/img/icon.png">
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+  <link rel="stylesheet" href="./assets/css/bulma.min.css">
+  <link rel="stylesheet" href="./assets/css/button.css">
+  <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./assets/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <script defer src="./assets/js/fontawesome.all.min.js"></script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']]
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+</head>
+
+<body>
+
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div class="navbar-start" style="flex-grow: 1; justify-content: center;">
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            More Research
+          </a>
+          <div class="navbar-dropdown">
+            <a class="navbar-item" href="https://zhengyinan-air.github.io/FISOR/">
+              <b>FISOR: Safe Offline Reinforcement Learning (ICLR 2024)</b>
+              <p style="font-size:18px; display: inline; margin-left: 5px;"></p>
+            </a>
+            <a class="navbar-item" href="https://zhengyinan-air.github.io/Diffusion-Planner/">
+              <b>Diffusion-Based Planning for Autonomous Driving with Flexible Guidance (ICLR 2025 Oral)</b>
+              <p style="font-size:18px; display: inline; margin-left: 5px;"></p>
+            </a>
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </nav>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title is-bold">
+              <img src="./assets/img/icon.png" style="width:1em;vertical-align: middle" alt="Logo" />
+              <span class="mmmu" style="vertical-align: middle">Hyper-Diffusion-Planner</span>
+            </h1>
+            <h2 class="subtitle is-3 publication-subtitle">
+              Unleashing the Potential of Diffusion Models for End-to-End Autonomous Driving
+              <!-- <br>
+                and Reasoning Benchmark for Expert AGI -->
+            </h2>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">Yinan Zheng*<sup style="color:#007bff;">†,1</sup>,</span>
+              <span class="author-block">Tianyi Tan*<sup style="color:#007bff;">1</sup>,</span>
+              <span class="author-block">Bin Huang*<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Enguang Liu<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Ruiming Liang<sup style="color:#007bff;">1</sup>,</span>
+              <span class="author-block">Jianlin Zhang<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Jianwei Cui<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Guang Chen<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Kun Ma<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Hangjun Ye<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Long Chen<sup style="color:#ffac33;">2</sup>,</span>
+              <span class="author-block">Ya-Qin Zhang<sup style="color:#007bff;">1</sup>,</span>
+              <span class="author-block">Xianyuan Zhan<sup style="color:#007bff;">✉,1,</sup>,</span>
+              <span class="author-block">Jingjing Liu<sup style="color:#007bff;">✉,1</sup>,</span>
+            </div>
+
+            <br>
+
+            <div class="is-size-6 publication-authors">
+              <span class="author-block"><sup style="color:#007bff;">1</sup>Institute for AI Industry Research (AIR),
+                Tsinghua University</span>
+              <span class="author-block"><sup style="color:#ffac33;">2</sup>Xiaomi EV</span><br>
+            </div>
+
+            <br>
+            <div class="is-size-6 publication-authors">
+              <span class="author-block">*Equal contribution, ✉Corresponding author</span><br>
+              <span class="author-block">†Project Lead:</span>
+              <span class="author-block"><a
+                  href="mailto:zhengyn23@mails.tsinghua.edu.cn">zhengyn23@mails.tsinghua.edu.cn</a></span>
+            </div>
+
+
+            <div class="column has-text-centered">
+              <!-- <h1 class="title is-4 mmmu" style="margin-top: 2vh">🌟 Accepted by ICLR 2025, Oral</h1> -->
+              <div class="publication-links">
+                <!-- PDF Link. -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/pdf/2501.15564" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Arxiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://github.com/ZhengYinan-AIR/Diffusion-Planner"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <style>
+    .center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%;
+    }
+  </style>
+
+
+  <!-- <section class="hero is-light is-small", style=""> -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="content has-text-centered">
+        <img src="./assets/img/framework.jpeg" alt="geometric reasoning" width="100%" />
+        <p><b><i>Figure 1:</i></b> Overview of Hyper Diffusion Planner (HDP)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- </section> -->
+
+  <section class="section">
+    <div class="container is-max-desktop" style="margin-bottom: 2vh;">
+      <!-- Abstract. -->
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Diffusion models have become a popular choice for decision-making tasks in robotics, and more recently,
+              are also being considered for solving autonomous driving tasks. However, their applications and
+              evaluations in autonomous driving remain limited to simulation-based or laboratory settings. The full
+              strength of diffusion models for large-scale, complex real-world settings, such as End-to-End Autonomous
+              Driving (E2E AD), remains underexplored. <b>In this study, we conducted a systematic and large-scale
+                investigation to unleash the potential of the diffusion models as planners for E2E AD, based on a
+                tremendous amount of real-vehicle data and road testing.</b> Through comprehensive and carefully
+              controlled
+              studies, we identify key insights into the diffusion loss space, trajectory representation, and data
+              scaling that significantly impact E2E planning performance. Moreover, we also provide an effective
+              reinforcement learning post-training strategy to further enhance the safety of the learned planner. The
+              resulting diffusion-based learning framework, Hyper Diffusion Planner (HDP), is deployed on a real-vehicle
+              platform and evaluated across 6 urban driving scenarios and 200
+              km of real-world testing, achieving a notable 10x performance improvement over the base model. <b>Our work
+                demonstrates that diffusion models, when properly designed and trained, can serve as effective and
+                scalable E2E AD planners for complex, real-world autonomous driving tasks.</b>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!--/ Abstract. -->
+    </div>
+  </section>
+
+
+
+  <footer class="footer">
+    <!-- <div class="container"> -->
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content has-text-centered">
+          <p>
+            This website is website adapted from <a href="https://mmmu-benchmark.github.io/">MMMU</a>, licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+              Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+
+
+<script>let currentSlide = 0;
+
+  //  <!-- zjl revise here!!!!! -->
+  const slide_length = [0, 6, 10, 16, 20]
+  const slideContainer = document.getElementById('slider-container');
+  const slides = slideContainer.children;
+  const dots = document.querySelectorAll('#slider-dots button');
+  const totalSlides = slides.length;
+  function updateSlider(animate = true) {
+    const slideWidth = slides[0].offsetWidth + 16;
+    const offset = currentSlide * slideWidth;
+
+    if (animate) {
+      slideContainer.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    } else {
+      slideContainer.style.transition = 'none';
+    }
+
+    slideContainer.style.transform = `translateX(-${offset}px)`;
+
+    dots.forEach((dot, index) => {
+      dot.style.backgroundColor = (slide_length[index] <= currentSlide & currentSlide < slide_length[index + 1]) ? '#4F46E5' : '#D1D5DB';
+    });
+  }
+  function slideLeft() {
+    if (currentSlide > 0) {
+      currentSlide--;
+      updateSlider();
+    } else {
+      // Optional: Bounce effect when at the start
+      slideContainer.style.transform = `translateX(20px)`;
+      setTimeout(() => {
+        slideContainer.style.transform = `translateX(0px)`;
+      }, 150);
+    }
+  }
+  function slideRight() {
+    if (currentSlide < totalSlides - 1) {
+      currentSlide++;
+      updateSlider();
+    } else {
+      // Optional: Bounce effect when at the end
+      const maxOffset = (totalSlides - 1) * (slides[0].offsetWidth + 16);
+      slideContainer.style.transform = `translateX(-${maxOffset - 20}px)`;
+      setTimeout(() => {
+        slideContainer.style.transform = `translateX(-${maxOffset}px)`;
+      }, 150);
+    }
+  }
+  function handleTouchStart(e) {
+    const touch = e.touches[0];
+    window.touchStartX = touch.clientX;
+    window.touchStartY = touch.clientY;
+    slideContainer.style.transition = 'none';
+  }
+  function handleTouchMove(e) {
+    if (!window.touchStartX) return;
+
+    const touch = e.touches[0];
+    const diffX = touch.clientX - window.touchStartX;
+    const diffY = touch.clientY - window.touchStartY;
+
+    // If vertical scrolling is dominant, don't slide
+    if (Math.abs(diffY) > Math.abs(diffX)) return;
+
+    e.preventDefault();
+    const slideWidth = slides[0].offsetWidth + 16;
+    const currentOffset = -(currentSlide * slideWidth);
+    const newOffset = currentOffset + diffX;
+
+    slideContainer.style.transform = `translateX(${newOffset}px)`;
+  }
+  function handleTouchEnd(e) {
+    if (!window.touchStartX) return;
+
+    const touch = e.changedTouches[0];
+    const diffX = touch.clientX - window.touchStartX;
+
+    if (Math.abs(diffX) > 50) {
+      if (diffX > 0 && currentSlide > 0) {
+        slideLeft();
+      } else if (diffX < 0 && currentSlide < totalSlides - 1) {
+        slideRight();
+      } else {
+        updateSlider();
+      }
+    } else {
+      updateSlider();
+    }
+
+    window.touchStartX = null;
+    window.touchStartY = null;
+  }
+  // Add touch events
+  slideContainer.addEventListener('touchstart', handleTouchStart);
+  slideContainer.addEventListener('touchmove', handleTouchMove);
+  slideContainer.addEventListener('touchend', handleTouchEnd);
+  // Add click event listeners to buttons
+  const leftButton = document.getElementById('id-88');
+  const rightButton = document.getElementById('id-90');
+  if (leftButton) leftButton.addEventListener('click', slideLeft);
+  if (rightButton) rightButton.addEventListener('click', slideRight);
+  // Add click events to dots
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      currentSlide = slide_length[index];
+      updateSlider();
+    });
+  });
+  // Initialize slider
+  document.addEventListener('DOMContentLoaded', () => {
+    updateSlider(false);
+  });
+  // Update on window resize with debounce
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => updateSlider(false), 100);
+  });</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const videoContainers = document.querySelectorAll('.video-container');
+    const videoButtons = document.querySelectorAll('.video-switch-btn');
+    const imageContainers = document.querySelectorAll('.image-container');
+    const imageButtons = document.querySelectorAll('.image-switch-btn');
+
+    // 显示相应组的内容并更新按钮颜色
+    function showGroup(groupNumber, containers, buttons) {
+      containers.forEach(container => {
+        if (container.classList.contains(`group-${groupNumber}`)) {
+          container.style.display = 'block';
+        } else {
+          container.style.display = 'none';
+        }
+      });
+
+      buttons.forEach(btn => {
+        if (btn.dataset.group === groupNumber.toString()) {
+          btn.classList.add('bg-custom', 'text-white'); // 设置选中的按钮样式
+          btn.classList.remove('bg-white');
+        } else {
+          btn.classList.remove('bg-custom', 'text-white'); // 移除非选中按钮的样式
+          btn.classList.add('bg-white');
+        }
+      });
+    }
+
+    // 为视频按钮添加点击事件
+    videoButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        showGroup(parseInt(btn.dataset.group), videoContainers, videoButtons);
+      });
+    });
+
+    // 为图片按钮添加点击事件
+    imageButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        showGroup(parseInt(btn.dataset.group), imageContainers, imageButtons);
+      });
+    });
+
+    // 初始化时默认显示第一组（组1）
+    showGroup(1, videoContainers, videoButtons);
+    showGroup(1, imageContainers, imageButtons);
+  });
+
+  // const initialimgButton = document.querySelector('.image-switch-btn[data-group="1"]');
+  // if (initialimgButton) {
+  //   initialimgButton.focus(); // 触发按钮的 focus 状态
+  // }
+
+  // const initialvideoButton = document.querySelector('.video-switch-btn[data-group="1"]');
+  // if (initialvideoButton) {
+  //  initialvideoButton.focus(); // 触发按钮的 focus 状态
+  // }
+</script>
