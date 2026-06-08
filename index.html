@@ -160,6 +160,27 @@
 
     <div class="wrapper">
       <!-- <article class="post"> -->
+      <div class="news-video-row">
+        <figure class="news-video-card">
+          <video muted playsinline preload="metadata" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
+            <source src="https://cloud.tsinghua.edu.cn/f/6a968036d6c7412aaf0b/?dl=1#t=1" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </figure>
+        <figure class="news-video-card">
+          <video muted playsinline preload="metadata" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
+            <source src="https://cloud.tsinghua.edu.cn/f/ce13d1720d6f4de5b15d/?dl=1#t=1" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </figure>
+        <figure class="news-video-card">
+          <video muted playsinline preload="metadata" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
+            <source src="https://cloud.tsinghua.edu.cn/f/e03b6350f7d347279a17/?dl=1#t=1" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </figure>
+      </div>
+
       <header class="post-header">
         <h1 class="post-title">News </h1>
       </header>
@@ -490,6 +511,25 @@
           }
           toggle.textContent = expanded ? 'Show less' : 'Show more';
         };
+      })();
+    </script>
+
+    <script>
+      (function() {
+        var videos = document.querySelectorAll('.news-video-card video');
+        for (var i = 0; i < videos.length; i++) {
+          videos[i].addEventListener('mouseenter', function() {
+            this.setAttribute('controls', '');
+          });
+          videos[i].addEventListener('click', function() {
+            this.setAttribute('controls', '');
+          });
+          videos[i].addEventListener('mouseleave', function() {
+            if (this.paused) {
+              this.removeAttribute('controls');
+            }
+          });
+        }
       })();
     </script>
 
