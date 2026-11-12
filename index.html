@@ -19,7 +19,7 @@
   <title>Yinan Zheng</title>
   <meta name="description" content="Yinan Zheng — PhD candidate at AIR, Tsinghua University">
 
-  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="main.css?v=20261112-videos3">
   <link rel="canonical" href="https://zhengyinan-air.github.io">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -160,22 +160,22 @@
 
     <div class="wrapper">
       <!-- <article class="post"> -->
-      <div class="news-video-row">
+      <div class="news-video-row" id="FeaturedVideos">
         <figure class="news-video-card">
-          <video muted playsinline preload="metadata" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
+          <video muted playsinline preload="none" poster="assets/images/basal-video-poster.jpg" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false" aria-label="BASAL Intelligence video">
+            <source src="https://cloud.tsinghua.edu.cn/f/db2908d1260241e6b1d5/?dl=1" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </figure>
+        <figure class="news-video-card">
+          <video muted playsinline preload="none" poster="assets/images/hyper-diffusion-planner-poster.jpg" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
             <source src="https://cloud.tsinghua.edu.cn/f/6a968036d6c7412aaf0b/?dl=1#t=1" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </figure>
         <figure class="news-video-card">
-          <video muted playsinline preload="metadata" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
+          <video muted playsinline preload="none" poster="assets/images/x-vla-poster.jpg" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
             <source src="https://cloud.tsinghua.edu.cn/f/ce13d1720d6f4de5b15d/?dl=1#t=1" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </figure>
-        <figure class="news-video-card">
-          <video muted playsinline preload="metadata" controlsList="nodownload" disablepictureinpicture oncontextmenu="return false">
-            <source src="https://cloud.tsinghua.edu.cn/f/e03b6350f7d347279a17/?dl=1#t=1" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </figure>
@@ -186,6 +186,7 @@
       </header>
       <article class="post" id="newsSection">
         <ul id="newsList">
+          <li><a href="https://x.com/BasalINT/status/2117598920402706657">Hello Basal</a></li>
           <li>🌟We release <a href="https://zhengyinan-air.github.io/Hyper-Diffusion-Planner/">Hyper-Diffusion-Planner</a>, a framework that unleashes the potential of diffusion models for end-to-end autonomous driving and has been successfully deployed on a real vehicle for closed-loop testing.</li>
           <li>Three papers have been accepted to <strong>ICLR 2026</strong>, including a stable diffusion RL
             post-training approch <a href="https://arxiv.org/pdf/2601.00898v1">DIPOLE</a>, a discrete diffusion-based
